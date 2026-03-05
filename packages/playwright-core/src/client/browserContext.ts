@@ -111,6 +111,10 @@ export class BrowserContext extends ChannelOwner<channels.BrowserContextChannel>
       this._serviceWorkers.add(serviceWorker);
       this.emit(Events.BrowserContext.ServiceWorker, serviceWorker);
     });
+    this._channel.on('sidePanel', ({ page }) => {
+      const sidePanel = Page.from(page);
+      this.emit(Events.BrowserContext.SidePanel, sidePanel);
+    });
     this._channel.on('console', event => {
       const worker = Worker.fromNullable(event.worker);
       const page = Page.fromNullable(event.page);

@@ -79,17 +79,28 @@ export class CRBrowser extends Browser {
     // We don't trust the option as it may lie in case of connectOverCDP where remote browser
     // may have been launched with different options.
     browser.options.headful = !version.userAgent.includes('Headless');
+    // Include type "other" in auto-attach filter so that chrome-extension://
+    // side panel targets are attached and can be detected.
+    const autoAttachFilter = [
+      { type: 'browser', exclude: true },
+      { type: 'tab', exclude: true },
+      {}, // include everything else (page, service_worker, other, etc.)
+    ];
     if (!options.persistent) {
-      await session.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true });
+      await session.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true, filter: autoAttachFilter });
+      // Enable target discovery for side panel targets (type "other") that may not be auto-attached.
+      await session.send('Target.setDiscoverTargets', { discover: true, filter: [{}] }).catch(() => {});
       return browser;
     }
     browser._defaultContext = new CRBrowserContext(browser, undefined, options.persistent);
     await Promise.all([
-      session.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true }).then(async () => {
+      session.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: true, flatten: true, filter: autoAttachFilter }).then(async () => {
         // Target.setAutoAttach has a bug where it does not wait for new Targets being attached.
         // However making a dummy call afterwards fixes this.
         // This can be removed after https://chromium-review.googlesource.com/c/chromium/src/+/2885888 lands in stable.
         await session.send('Target.getTargetInfo');
+        // Enable target discovery for side panel targets (type "other") that may not be auto-attached.
+        await session.send('Target.setDiscoverTargets', { discover: true, filter: [{}] }).catch(() => {});
       }),
       (browser._defaultContext as CRBrowserContext)._initialize(),
     ]);
@@ -178,7 +189,12 @@ export class CRBrowser extends Browser {
       return;
     }
 
-    const treatOtherAsPage = targetInfo.type === 'other' && process.env.PW_CHROMIUM_ATTACH_TO_OTHER;
+    // Detect chrome-extension:// side panel targets. These appear as type "other"
+    // and may initially have an empty URL that later resolves to chrome-extension://.
+    const isSidePanel = targetInfo.type === 'other' && (
+      targetInfo.url.startsWith('chrome-extension://') || targetInfo.url === ''
+    );
+    const treatOtherAsPage = targetInfo.type === 'other' && (process.env.PW_CHROMIUM_ATTACH_TO_OTHER || isSidePanel);
 
     if (!context || (targetInfo.type === 'other' && !treatOtherAsPage)) {
       session.detach().catch(() => {});
@@ -192,6 +208,13 @@ export class CRBrowser extends Browser {
       const opener = targetInfo.openerId ? this._crPages.get(targetInfo.openerId) || null : null;
       const crPage = new CRPage(session, targetInfo.targetId, context, opener, { hasUIWindow: targetInfo.type === 'page' });
       this._crPages.set(targetInfo.targetId, crPage);
+      if (isSidePanel) {
+        crPage._page.waitForInitializedOrError().then(pageOrError => {
+          const url = crPage._page.mainFrame().url();
+          if (!(pageOrError instanceof Error) && url.startsWith('chrome-extension://'))
+            context!.emit(CRBrowserContext.CREvents.SidePanel, crPage._page);
+        }).catch(() => {});
+      }
       return;
     }
 
@@ -331,10 +354,12 @@ export class CRBrowser extends Browser {
 
 const CREvents = {
   ServiceWorker: 'serviceworker',
+  SidePanel: 'sidepanel',
 } as const;
 
 export type CREventsMap = {
   [CREvents.ServiceWorker]: [serviceWorker: CRServiceWorker];
+  [CREvents.SidePanel]: [page: Page];
 };
 
 export class CRBrowserContext extends BrowserContext<CREventsMap> {

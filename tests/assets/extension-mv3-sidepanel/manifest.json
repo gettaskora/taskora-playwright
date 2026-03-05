@@ -1,0 +1,15 @@
+{
+  "name": "Side Panel Test Extension",
+  "version": "0.1",
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "permissions": ["sidePanel", "activeTab"],
+  "action": {
+    "default_title": "Open Side Panel"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "manifest_version": 3
+}

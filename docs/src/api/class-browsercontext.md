@@ -283,6 +283,18 @@ Emitted when [response] status and headers are received for a request. For a suc
 is `request`, `response` and `requestfinished`. To listen for response events
 from a particular page, use [`event: Page.response`].
 
+## event: BrowserContext.sidePanel
+* since: v1.50
+* langs: js, python
+- argument: <[Page]>
+
+:::note
+Side panels are only supported on Chromium-based browsers with extensions loaded.
+:::
+
+Emitted when a Chrome extension side panel is opened. The side panel is represented as a [Page] object,
+allowing full interaction including clicking, typing, and asserting DOM state.
+
 ## event: BrowserContext.serviceWorker
 * since: v1.11
 * langs: js, python

@@ -8712,6 +8712,15 @@ export interface BrowserContext {
   on(event: 'serviceworker', listener: (worker: Worker) => any): this;
 
   /**
+   * **NOTE** Side panels are only supported on Chromium-based browsers with extensions loaded.
+   *
+   * Emitted when a Chrome extension side panel is opened. The side panel is represented as a
+   * [Page](https://playwright.dev/docs/api/class-page) object, allowing full interaction including clicking, typing,
+   * and asserting DOM state.
+   */
+  on(event: 'sidepanel', listener: (page: Page) => any): this;
+
+  /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular
    * page, use [page.on('pageerror')](https://playwright.dev/docs/api/class-page#page-event-page-error) instead.
    */
@@ -8766,6 +8775,11 @@ export interface BrowserContext {
    * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
    */
   once(event: 'serviceworker', listener: (worker: Worker) => any): this;
+
+  /**
+   * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
+   */
+  once(event: 'sidepanel', listener: (page: Page) => any): this;
 
   /**
    * Adds an event listener that will be automatically removed after it is triggered once. See `addListener` for more information about this event.
@@ -8904,6 +8918,15 @@ export interface BrowserContext {
   addListener(event: 'serviceworker', listener: (worker: Worker) => any): this;
 
   /**
+   * **NOTE** Side panels are only supported on Chromium-based browsers with extensions loaded.
+   *
+   * Emitted when a Chrome extension side panel is opened. The side panel is represented as a
+   * [Page](https://playwright.dev/docs/api/class-page) object, allowing full interaction including clicking, typing,
+   * and asserting DOM state.
+   */
+  addListener(event: 'sidepanel', listener: (page: Page) => any): this;
+
+  /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular
    * page, use [page.on('pageerror')](https://playwright.dev/docs/api/class-page#page-event-page-error) instead.
    */
@@ -8962,6 +8985,11 @@ export interface BrowserContext {
   /**
    * Removes an event listener added by `on` or `addListener`.
    */
+  removeListener(event: 'sidepanel', listener: (page: Page) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
   removeListener(event: 'weberror', listener: (webError: WebError) => any): this;
 
   /**
@@ -9013,6 +9041,11 @@ export interface BrowserContext {
    * Removes an event listener added by `on` or `addListener`.
    */
   off(event: 'serviceworker', listener: (worker: Worker) => any): this;
+
+  /**
+   * Removes an event listener added by `on` or `addListener`.
+   */
+  off(event: 'sidepanel', listener: (page: Page) => any): this;
 
   /**
    * Removes an event listener added by `on` or `addListener`.
@@ -9149,6 +9182,15 @@ export interface BrowserContext {
    * Emitted when new service worker is created in the context.
    */
   prependListener(event: 'serviceworker', listener: (worker: Worker) => any): this;
+
+  /**
+   * **NOTE** Side panels are only supported on Chromium-based browsers with extensions loaded.
+   *
+   * Emitted when a Chrome extension side panel is opened. The side panel is represented as a
+   * [Page](https://playwright.dev/docs/api/class-page) object, allowing full interaction including clicking, typing,
+   * and asserting DOM state.
+   */
+  prependListener(event: 'sidepanel', listener: (page: Page) => any): this;
 
   /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular
@@ -9933,6 +9975,15 @@ export interface BrowserContext {
    * Emitted when new service worker is created in the context.
    */
   waitForEvent(event: 'serviceworker', optionsOrPredicate?: { predicate?: (worker: Worker) => boolean | Promise<boolean>, timeout?: number } | ((worker: Worker) => boolean | Promise<boolean>)): Promise<Worker>;
+
+  /**
+   * **NOTE** Side panels are only supported on Chromium-based browsers with extensions loaded.
+   *
+   * Emitted when a Chrome extension side panel is opened. The side panel is represented as a
+   * [Page](https://playwright.dev/docs/api/class-page) object, allowing full interaction including clicking, typing,
+   * and asserting DOM state.
+   */
+  waitForEvent(event: 'sidepanel', optionsOrPredicate?: { predicate?: (page: Page) => boolean | Promise<boolean>, timeout?: number } | ((page: Page) => boolean | Promise<boolean>)): Promise<Page>;
 
   /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular

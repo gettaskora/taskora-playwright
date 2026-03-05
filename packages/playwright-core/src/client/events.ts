@@ -44,6 +44,7 @@ export const Events = {
     WebError: 'weberror',
     BackgroundPage: 'backgroundpage',  // Deprecated in v1.56, never emitted anymore.
     ServiceWorker: 'serviceworker',
+    SidePanel: 'sidepanel',
     Request: 'request',
     Response: 'response',
     RequestFailed: 'requestfailed',

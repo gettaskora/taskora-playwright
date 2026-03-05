@@ -132,6 +132,7 @@ export class BrowserContextDispatcher extends Dispatcher<BrowserContext, channel
       for (const serviceWorker of (context as CRBrowserContext).serviceWorkers())
         this._dispatchEvent('serviceWorker', { worker: new WorkerDispatcher(this, serviceWorker) });
       this.addObjectListener(CRBrowserContext.CREvents.ServiceWorker, serviceWorker => this._dispatchEvent('serviceWorker', { worker: new WorkerDispatcher(this, serviceWorker) }));
+      this.addObjectListener(CRBrowserContext.CREvents.SidePanel, page => this._dispatchEvent('sidePanel', { page: PageDispatcher.from(this, page) }));
     }
     this.addObjectListener(BrowserContext.Events.Request, (request: Request) =>  {
       // Create dispatcher, if:
