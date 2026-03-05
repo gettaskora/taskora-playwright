@@ -406,6 +406,10 @@ BrowserContext:
       parameters:
         worker: Worker
 
+    sidePanel:
+      parameters:
+        page: Page
+
     request:
       parameters:
         request: Request

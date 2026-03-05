@@ -741,6 +741,9 @@ scheme.BrowserContextWebSocketRouteEvent = tObject({
 scheme.BrowserContextServiceWorkerEvent = tObject({
   worker: tChannel(['Worker']),
 });
+scheme.BrowserContextSidePanelEvent = tObject({
+  page: tChannel(['Page']),
+});
 scheme.BrowserContextRequestEvent = tObject({
   request: tChannel(['Request']),
   page: tOptional(tChannel(['Page'])),
