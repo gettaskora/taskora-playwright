@@ -92,6 +92,14 @@ it.describe('Side Panel', () => {
     expect(panel).toBeTruthy();
     await panel.waitForLoadState('domcontentloaded');
 
+    // Verify chrome extension APIs are available in the side panel
+    const chromeApis = await panel.evaluate(() => ({
+      hasChromeRuntime: typeof chrome !== 'undefined' && !!chrome.runtime,
+      hasChromeRuntimeId: typeof chrome !== 'undefined' && chrome.runtime && !!chrome.runtime.id,
+    }));
+    expect(chromeApis.hasChromeRuntime).toBe(true);
+    expect(chromeApis.hasChromeRuntimeId).toBe(true);
+
     // Verify side panel content
     const heading = await panel.locator('#heading').textContent();
     expect(heading).toBe('Side Panel Content');
