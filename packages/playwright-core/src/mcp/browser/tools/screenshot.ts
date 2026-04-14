@@ -71,15 +71,25 @@ const screenshot = defineTabTool({
   }
 });
 
+// Claude many-image API rejects any request containing an image whose width
+// OR height exceeds 2000 pixels. Keep this as a hard cap — screenshots over
+// this limit cause run-breaking 400 errors from the Anthropic API.
+const MAX_IMAGE_DIMENSION = 2000;
+
 export function scaleImageToFitMessage(buffer: Buffer, imageType: 'png' | 'jpeg'): Buffer {
   // https://docs.claude.com/en/docs/build-with-claude/vision#evaluate-image-size
-  // Not more than 1.15 megapixel, linear size not more than 1568.
+  // Not more than 1.15 megapixel; additionally many-image requests cap each
+  // linear dimension at 2000px.
 
   const image = imageType === 'png' ? PNG.sync.read(buffer) : jpegjs.decode(buffer, { maxMemoryUsageInMB: 512 });
   const pixels = image.width * image.height;
 
-  const shrink = Math.min(1568 / image.width, 1568 / image.height, Math.sqrt(1.15 * 1024 * 1024 / pixels));
-  if (shrink > 1)
+  const shrink = Math.min(
+    MAX_IMAGE_DIMENSION / image.width,
+    MAX_IMAGE_DIMENSION / image.height,
+    Math.sqrt(1.15 * 1024 * 1024 / pixels),
+  );
+  if (shrink >= 1)
     return buffer;
 
   const width = image.width * shrink | 0;
