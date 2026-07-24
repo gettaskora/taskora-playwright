@@ -122,7 +122,25 @@ class ProgramStep extends Step {
   async run() {
     const step = this._options;
     console.log(`==== Running ${step.command} ${step.args.join(' ')} in ${step.cwd || process.cwd()}`);
-    const child = child_process.spawn(step.command, step.args, {
+    // When spawning through a shell, Node passes args verbatim into the command
+    // line, so an arg containing whitespace — e.g. an absolute script path under
+    // a checkout directory with a space in its name — splits into separate argv
+    // entries and the step dies with MODULE_NOT_FOUND. Quote such args here.
+    // cmd.exe treats only double quotes as quoting; POSIX shells use single
+    // quotes (with the standard '\'' escape for embedded single quotes).
+    /**
+     * @param {string} arg
+     * @return {string}
+     */
+    const quoteForShell = (arg) => {
+      if (!/\s/.test(arg))
+        return arg;
+      return process.platform === 'win32'
+        ? `"${arg.replace(/"/g, '\\"')}"`
+        : `'${arg.replace(/'/g, `'\\''`)}'`;
+    };
+    const spawnArgs = step.shell ? step.args.map(quoteForShell) : step.args;
+    const child = child_process.spawn(step.command, spawnArgs, {
       stdio: 'inherit',
       shell: step.shell,
       env: {
