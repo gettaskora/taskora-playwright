@@ -11078,7 +11078,7 @@ export interface BrowserContext {
    * [Page](https://playwright.dev/docs/api/class-page) object, allowing full interaction including clicking, typing,
    * and asserting DOM state.
    */
-  waitForEvent(event: 'sidepanel', optionsOrPredicate?: { predicate?: (page: Page) => boolean | Promise<boolean>, timeout?: number } | ((page: Page) => boolean | Promise<boolean>)): Promise<Page>;
+  waitForEvent(event: 'sidepanel', optionsOrPredicate?: { predicate?: (page: Page) => boolean | Promise<boolean>, timeout?: number, signal?: AbortSignal } | ((page: Page) => boolean | Promise<boolean>)): Promise<Page>;
 
   /**
    * Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular
