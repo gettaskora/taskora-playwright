@@ -1303,6 +1303,7 @@ export interface BrowserContextEventTarget {
   _dispatchEvent(event: 'route', params?: BrowserContextRouteEvent): void;
   _dispatchEvent(event: 'webSocketRoute', params?: BrowserContextWebSocketRouteEvent): void;
   _dispatchEvent(event: 'serviceWorker', params?: BrowserContextServiceWorkerEvent): void;
+  _dispatchEvent(event: 'sidePanel', params?: BrowserContextSidePanelEvent): void;
   _dispatchEvent(event: 'request', params?: BrowserContextRequestEvent): void;
   _dispatchEvent(event: 'requestFailed', params?: BrowserContextRequestFailedEvent): void;
   _dispatchEvent(event: 'requestFinished', params?: BrowserContextRequestFinishedEvent): void;
@@ -1393,6 +1394,9 @@ export type BrowserContextWebSocketRouteEvent = {
 };
 export type BrowserContextServiceWorkerEvent = {
   worker: WorkerChannel,
+};
+export type BrowserContextSidePanelEvent = {
+  page: PageChannel,
 };
 export type BrowserContextRequestEvent = {
   request: RequestChannel,
@@ -1789,6 +1793,7 @@ export interface BrowserContextEvents {
   'route': BrowserContextRouteEvent;
   'webSocketRoute': BrowserContextWebSocketRouteEvent;
   'serviceWorker': BrowserContextServiceWorkerEvent;
+  'sidePanel': BrowserContextSidePanelEvent;
   'request': BrowserContextRequestEvent;
   'requestFailed': BrowserContextRequestFailedEvent;
   'requestFinished': BrowserContextRequestFinishedEvent;
